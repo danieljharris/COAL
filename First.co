@@ -1,0 +1,47 @@
+()voidFunc()
+{
+    println("Testing!")
+}
+
+(int)myFunction()
+{
+    return 8
+}
+
+(int, int)myDoubleFunction()
+{
+    return 37, 42
+}
+
+(int, int, int)returnBack(int x)
+{
+    return x, 88, x
+}
+
+(int)main()
+{
+    println("Yolo World!")
+
+    int counter = 0
+
+    println(counter)
+
+    voidFunc()
+
+    (int first)myFunction()
+
+    (int second, int third)myDoubleFunction()
+
+    println(first)
+    println(second)
+    println(third)
+    println("--------------------")
+
+    (int x, int y, int z)returnBack(10)
+
+    println(x)
+    println(y)
+    println(z)
+
+    return 0
+}
