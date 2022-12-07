@@ -18,6 +18,20 @@
     return x, 88, x
 }
 
+// (int|string)giveVariant(int in)
+// {
+//     if (in == 1) return 10
+//     if (in == 2) return "11"
+//     else         return "Hello World!"
+// }
+
+(lit, int | lit, lit)giveVariant2(int in)
+{
+    if (in == 1) return ok, 10
+    if (in == 2) return ok, 88
+    else         return error, unexpected_int
+}
+
 (int)main()
 {
     println("Yolo World!")
@@ -42,6 +56,14 @@
     println(x)
     println(y)
     println(z)
+
+    // (int variInt, string variStr)giveVariant(1)
+    
+    match giveVariant2(1)
+    {
+        (lit ok, int variInt) => println("ok: " + variInt)
+        (lit error, lit msg) => println("error: " + msg)
+    }
 
 
     return 0
