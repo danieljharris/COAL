@@ -1,30 +1,3 @@
-()voidFunc()
-{
-    println("Testing!")
-}
-
-(int)myFunction()
-{
-    return 8
-}
-
-(int, int)myDoubleFunction()
-{
-    return 37, 42
-}
-
-(int, int, int)returnBack(int x)
-{
-    return x, 88, x
-}
-
-// (int|string)giveVariant(int in)
-// {
-//     if (in == 1) return 10
-//     if (in == 2) return "11"
-//     else         return "Hello World!"
-// }
-
 (lit, int | lit, lit)giveVariant2(int in)
 {
     if (in == 1) return ok, 10
@@ -34,37 +7,42 @@
 
 (int)main()
 {
-    println("Yolo World!")
+    // match giveVariant2(1)
+    // {
+    //     (lit ok, int variInt) => println("ok: " + variInt)
+    //     (lit error, lit msg)  => println("error: " + msg)
+    // }
 
-    int counter = 0
-
-    println(counter)
-
-    voidFunc()
-
-    (int first)myFunction()
-
-    (int second, int third)myDoubleFunction()
-
-    println(first)
-    println(second)
-    println(third)
-    println("--------------------")
-
-    (int x, int y, int z)returnBack(10)
-
-    println(x)
-    println(y)
-    println(z)
-
-    // (int variInt, string variStr)giveVariant(1)
-    
     match giveVariant2(1)
     {
-        (lit ok, int variInt) => println("ok: " + variInt)
-        (lit error, lit msg) => println("error: " + msg)
+        (lit ok, int variInt)
+        {
+            println("ok: " + variInt)
+        }
+        (lit error, lit msg)
+        {
+            println("error: " + msg)
+        }
     }
 
+    {
+        variant<tuple<lit, int>, tuple<lit, lit>> variTuple = giveVariant2(1);
+
+        if (const auto ptr = get_if<tuple<lit, int>>(&variTuple)) 
+        {
+            lit ok; int variInt;
+            tie(ok, variInt) = *ptr;
+
+            println("ok: " + variInt);
+        }
+        else if (const auto ptr = get_if<tuple<lit, lit>>(&variTuple))
+        {
+            lit error; lit msg;
+            tie(error, msg) = *ptr;
+
+            println("error: " + msg);
+        }
+    }
 
     return 0
 }

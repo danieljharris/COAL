@@ -3,6 +3,7 @@
 using namespace std; 
 template <typename T> 
 void println(T var) { cout << var << endl; } 
+class lit : public string {};
 
 void voidFunc()
 {
@@ -28,28 +29,39 @@ int main()
 {
     println("Yolo World!");
 
+
     int counter = 0;
+
 
     println(counter);
 
+
     voidFunc();
+
 
     int first = myFunction();
 
+
     int second; int third;
     tie(second, third) = myDoubleFunction();
+
 
     println(first);
     println(second);
     println(third);
     println("--------------------");
 
+
     int x; int y; int z;
     tie(x, y, z) = returnBack(10);
+
 
     println(x);
     println(y);
     println(z);
+
+
+
 
     return 0;
 }

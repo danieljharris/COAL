@@ -39,6 +39,7 @@
   "files.associations": {
     "iosfwd": "cpp",
     "string": "cpp",
-    "tuple": "cpp"
+    "tuple": "cpp",
+    "*.co": "cpp"
   }
 }
