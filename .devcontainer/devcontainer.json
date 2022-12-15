@@ -1,3 +1,4 @@
 {
+  "name": "COAL Miner",
   "build": { "dockerfile": "Dockerfile" }
 }
