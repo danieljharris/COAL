@@ -62,7 +62,7 @@ int main()
 
     tuple<int, int> holdingTuple = myDoubleFunction();
     int u = get<0>(holdingTuple);
-    int k = holdingTuple<1>;
+    int k = get<1>(holdingTuple);
 
 
     println(u);

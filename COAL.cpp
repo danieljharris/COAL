@@ -108,6 +108,21 @@ string funcAndArgsIn(string str)
     return str.substr(str.find(")") + 1);
 }
 
+string getBefore(string str, string until)
+{
+    return str.substr(0, str.find(until));
+}
+string getAfter(string str, string after)
+{
+    return str.substr(str.find(after) + after.length());
+}
+
+// int k = holdingTuple<1> with < and > would reutrn 1
+string extractBetween(string str, string start, string end)
+{
+    return str.substr(str.find(start) + start.length(), str.find(end) - str.find(start) - (start.length() - end.length()) - 1);
+}
+
 string replace(string str, string find, string replace)
 {
     int pos = str.find(find);
@@ -295,6 +310,13 @@ void burnCoalInside(string line, ofstream &out)
     else if (has(line, "return", ","))
     {
         out << "    return make_tuple(" << returnsOut(line) << ");\n";
+    }
+    else if (lastIs(line, '>'))
+    {
+        out << getBefore(line, "=")
+            << "= get<" << extractBetween(line, "<", ">")
+            << ">(" << extractBetween(line, " = ", "<")
+            << ");\n";
     }
     else
     {

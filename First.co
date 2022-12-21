@@ -40,7 +40,7 @@
     println("--------------------")
 
     (int, int) holdingTuple = myDoubleFunction()
-    int u = get<0>(holdingTuple)
+    int u = holdingTuple<0>
     int k = holdingTuple<1>
 
     println(u)
