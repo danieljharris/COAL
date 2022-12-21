@@ -1,4 +1,18 @@
 {
   "name": "COAL Miner",
-  "build": { "dockerfile": "Dockerfile" }
+"build": {
+	"dockerfile": "Dockerfile"
+},
+"customizations": {
+	"vscode": {
+		"extensions": [
+			"GitHub.copilot",
+			"ms-vscode.cpptools",
+			"ms-vscode.cpptools-extension-pack",
+			"ms-vscode.cpptools-themes",
+			"jeff-hykin.better-cpp-syntax",
+			"GitHub.copilot-labs"
+		]
+	}
+}
 }
