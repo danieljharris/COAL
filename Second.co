@@ -1,47 +1,38 @@
-(lit, int | lit, lit)giveVariant2(int in)
+//variant<tuple<lit, int>, tuple<lit, lit>>giveVariant2(int in)
+(str, int | str, str)giveVariant2(int in)
 {
-    if (in == 1) return ok, 10
-    if (in == 2) return ok, 88
-    else         return error, unexpected_int
+    if (in == 1) return "ok", 10
+    if (in == 2) return "ok", 88
+    else         return "error", "unexpected_int"
+}
+
+(int | str)giveVariant3(int in)
+{
+    if (in == 1) return "ok", 10
+    if (in == 2) return "ok", 88
+    else         return "error", "unexpected_int"
+}
+
+(int | str, int)giveVariant4(int in)
+{
+    if (in == 1) return "ok", 10
+    if (in == 2) return "ok", 88
+    else         return "error", "unexpected_int"
 }
 
 (int)main()
 {
-    // match giveVariant2(1)
-    // {
-    //     (lit ok, int variInt) => println("ok: " + variInt)
-    //     (lit error, lit msg)  => println("error: " + msg)
-    // }
+    // (str, int | str, str)giveVariant2(1)
 
-    match giveVariant2(1)
+
+
+    (str, int | str, str) myVari = giveVariant2(1)
+
+
+    match (testing123)
     {
-        (lit ok, int variInt)
-        {
-            println("ok: " + variInt)
-        }
-        (lit error, lit msg)
-        {
-            println("error: " + msg)
-        }
-    }
-
-    {
-        variant<tuple<lit, int>, tuple<lit, lit>> variTuple = giveVariant2(1);
-
-        if (const auto ptr = get_if<tuple<lit, int>>(&variTuple)) 
-        {
-            lit ok; int variInt;
-            tie(ok, variInt) = *ptr;
-
-            println("ok: " + variInt);
-        }
-        else if (const auto ptr = get_if<tuple<lit, lit>>(&variTuple))
-        {
-            lit error; lit msg;
-            tie(error, msg) = *ptr;
-
-            println("error: " + msg);
-        }
+        (lit ok, int variInt) => println("ok: " + variInt)
+        (lit error, lit msg)  => println("error: " + msg)
     }
 
     return 0

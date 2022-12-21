@@ -1,6 +1,11 @@
 #include <iostream> 
+#include <variant> 
 #include <tuple> 
+#include <cstdio> 
+#include "mpark/patterns.hpp" 
 using namespace std; 
+using namespace mpark::patterns; 
+using str = std::string; 
 template <typename T> 
 void println(T var) { cout << var << endl; } 
 class lit : public string {};
@@ -20,9 +25,9 @@ tuple<int, int> myDoubleFunction()
     return make_tuple(37, 42);
 }
 
-tuple<int, int, int> returnBack(int x)
+tuple<str, int, int> returnBack(int x)
 {
-    return make_tuple(x, 88, x);
+    return make_tuple("xxxx", 88, x);
 }
 
 int main()
@@ -42,17 +47,30 @@ int main()
     int first = myFunction();
 
 
+    println(first);
+    println("--------------------");
+
+
     int second; int third;
     tie(second, third) = myDoubleFunction();
 
 
-    println(first);
     println(second);
     println(third);
     println("--------------------");
 
 
-    int x; int y; int z;
+    tuple<int, int> holdingTuple = myDoubleFunction();
+    int u = get<0>(holdingTuple);
+    int k = holdingTuple<1>;
+
+
+    println(u);
+    println(k);
+    println("--------------------");
+
+
+    str x; int y; int z;
     tie(x, y, z) = returnBack(10);
 
 

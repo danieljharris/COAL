@@ -13,9 +13,9 @@
     return 37, 42
 }
 
-(int, int, int)returnBack(int x)
+(str, int, int)returnBack(int x)
 {
-    return x, 88, x
+    return "xxxx", 88, x
 }
 
 (int)main()
@@ -30,14 +30,24 @@
 
     (int first)myFunction()
 
+    println(first)
+    println("--------------------")
+
     (int second, int third)myDoubleFunction()
 
-    println(first)
     println(second)
     println(third)
     println("--------------------")
 
-    (int x, int y, int z)returnBack(10)
+    (int, int) holdingTuple = myDoubleFunction()
+    int u = get<0>(holdingTuple)
+    int k = holdingTuple<1>
+
+    println(u)
+    println(k)
+    println("--------------------")
+
+    (str x, int y, int z)returnBack(10)
 
     println(x)
     println(y)
