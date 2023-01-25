@@ -8,9 +8,6 @@
 
 using namespace std;
 
-template <typename T>
-void println(T var) { cout << var << endl; }
-
 bool isInsideMatch = false;
 
 string boilerPlate()
@@ -61,30 +58,30 @@ class lit : public string {};\n\
 //     return returnNames;
 // }
 
-void insideMatch(LineIn l, ofstream &out)
+void insideMatch(str l, ofstream &out)
 {
-    if (has(line, "}")) isInsideMatch = false;
+    if (l.has("}")) isInsideMatch = false;
 
-    else if (firstIs(line, '{')) out << "(" << "\n";
-    else if (firstIs(line, '}')) out << ");" << "\n";
+    else if (l.firstIs('{')) out << "(" << "\n";
+    else if (l.firstIs('}')) out << ");" << "\n";
 
-    else if (firstIs(line, '('))
+    else if (l.firstIs('('))
     {
         out << "pattern(as<";
 
-        string returns = returnsIn(line);
-        string returnsTypes = getReturnTypes(returns);
+        str returns = str(l.returnsIn());
+        string returnsTypes = returns.getReturnTypes();
 
-        if (!has(returns, ","))
+        if (!l.has(","))
         {
-            out << "    " << "    " << returnsTypes << ">(arg)) = [](" << returns << ") {" << ";\n";
+            out << "    " << "    " << returnsTypes << ">(arg)) = [](" << returns.s << ") {" << ";\n";
         }
         else
         {
-            out << "    " << replace(returns, ",", ";") << ";\n";
+            out << "    " << returns.replace(",", ";") << ";\n";
             out << "    ";
-            out << "tie(" << getReturnNames(returns) << ") = ";
-            out << funcAndArgsIn(line) << ";\n";
+            out << "tie(" << returns.getReturnNames() << ") = ";
+            out << l.funcAndArgsIn() << ";\n";
         }
     }
 
@@ -103,8 +100,9 @@ void insideMatch(LineIn l, ofstream &out)
     // );
 }
 
-void burnCoalInside(LineIn l, ofstream &out)
+void burnCoalInside(string line, ofstream &out)
 {
+    str l(line);
     // Match
     if (l.has("match")) isInsideMatch = true;
     else if (isInsideMatch) insideMatch(l, out);
@@ -117,7 +115,7 @@ void burnCoalInside(LineIn l, ofstream &out)
         // int x; int y; int z;
         // tie(x, y, z) = returnBack(10);
 
-        string returns = l.returnsIn();
+        str returns = str(l.returnsIn());
 
         // else
         // {
@@ -139,82 +137,83 @@ void burnCoalInside(LineIn l, ofstream &out)
         //     out << "> ";
         // }
 
-        if (l.has(",", returns))
+        if (returns.has(","))
         {
-            if (l.has("|", returns))
+            if (returns.has("|"))
             {
                 // (str, int | str, str)giveVariant2(1)
 
                 out << "PLACE HOLDER";
             }
-            else if (has(line, "="))
+            else if (l.has("="))
             {
                 // (int, int) holdingTuple = myDoubleFunction()
                 // tuple<int, int> holdingTuple = myDoubleFunction()
 
                 // out << "tuple<" << split(returns, ',') << "> ";
-                out << "    tuple<" << getReturnTypes(returns) << ">";
-                out << funcAndArgsIn(line) << ";\n";
+                out << "    tuple<" << returns.getReturnTypes() << ">";
+                out << l.funcAndArgsIn() << ";\n";
             }
             else
             {
-                out << "    " << replace(returns, ",", ";") << ";\n";
+                out << "    " << returns.replace(",", ";") << ";\n";
                 out << "    ";
-                out << "tie(" << getReturnNames(returns) << ") = ";
-                out << funcAndArgsIn(line) << ";\n";
+                out << "tie(" << returns.getReturnNames() << ") = ";
+                out << l.funcAndArgsIn() << ";\n";
             }
         }
         else
         {
-            if (has(returns, "|"))
+            if (returns.has("|"))
                 out << "PLACE HOLDER";
             else
-                out << "    " << returns << " = " <<  funcAndArgsIn(line) << ";\n";
+                out << "    " << returns.s << " = " <<  l.funcAndArgsIn() << ";\n";
         }
     }
-    else if (has(line, "return", ","))
+    else if (l.has("return", ","))
     {
-        out << "    return make_tuple(" << returnsOut(line) << ");\n";
+        out << "    return make_tuple(" << l.returnsOut() << ");\n";
     }
-    else if (lastIs(line, '>'))
+    else if (l.lastIs('>'))
     {
-        out << getBefore(line, "=")
-            << "= get<" << extractBetween(line, "<", ">")
-            << ">(" << extractBetween(line, " = ", "<")
+        out << l.getBefore("=")
+            << "= get<" << l.extractBetween("<", ">")
+            << ">(" << l.extractBetween(" = ", "<")
             << ");\n";
     }
     else
     {
-        out << line;
-        if (line.length() > 0) out << ";";
+        out << l.s;
+        if (l.s.length() > 0) out << ";";
         out << endl;
     }
 }
 
 void burnCoalOutside(string line, ofstream &out)
 {
+    str l = str(line);
     if (line[0] == '(')
     {
-        string returns = line.substr(1, line.find(")") - 1);
+        str returns = str(line.substr(1, line.find(")") - 1));
         string funcAndArgs = line.substr(line.find(")") + 1);
 
-        if (returns.length() == 0)
+        if (returns.s.length() == 0)
         {
             out << "void ";
             out << funcAndArgs;
         }
-        else if (has(returns, ","))
+        else if (returns.has(","))
         {
-            if (has(returns, "|"))
+            if (returns.has("|"))
             {
                 out << "variant<";
 
-                vector<string> types = split(returns, '|');
+                vector<string> types = returns.split('|');
 
                 int index = 1;
                 for (string seg : types)
                 {
-                    if (has(seg, ","))
+                    if (str(seg).has(","))
                         out << "tuple<" << seg << ">";
                     else
                         out << seg;
@@ -233,11 +232,11 @@ void burnCoalOutside(string line, ofstream &out)
                 out << "> " << funcAndArgs;
             }
         }
-        else if (has(line, "|"))
+        else if (l.has("|"))
         {
             out << "variant<";
 
-            vector<string> types = split(returns, '|');
+            vector<string> types = returns.split('|');
 
             int index = 1;
             for (string seg : types)
@@ -281,7 +280,7 @@ int main()
 
     for (string line; getline(in, line); )
     {
-        if (firstIs(line, '/')) continue; //Skips over comments
+        if (str(line).firstIs('/')) continue; //Skips over comments
 
         if (insideFunction && line.length() == 0)
         {
