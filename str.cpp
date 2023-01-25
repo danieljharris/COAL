@@ -1,151 +1,163 @@
 #include <iostream>
-
-#include "estring.hpp"
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <list>
+#include <vector>
 
 using namespace std;
 
-// take a line and split it into a vector
-svector str::split(str split, uint limit) {
-	svector list;
-	size_t end,pos = 0;
-	
-	while(true) {
-		end = find(split,pos);
-		list.push_back(substr(pos,end-pos));
-		pos = end + split.size();
-		if(end == string::npos) break;
-		if(limit != 0) {
-			if(list.size() >= limit) {
-				list.push_back(substr(pos));
-				break;
-			}
-		}	
-	}
-	
-	return list;
-}
+class str
+{
+public:
+    string s;
+public:
+    str()
+    {
+        s = "";
+    }
+    str(string string)
+    {
+        s = string;
+    }
 
-// combine a svector and replace string
-void str::join(str sept, svector &list) {
-	assign(list[0]);
-	for(uint i = 1; i < list.size(); i++) {
-		append(sept);
-		append(list[i]);
-	}
-}
+    char firstC()
+    {
+        const char* t = " \t\n\r\f\v";
+        return s[s.find_first_not_of(t)];
+    }
 
-// append a svector to the string
-void str::ajoin(str sept, svector &list) {
-	for(uint i = 0; i < list.size(); i++) {
-		append(sept);
-		append(list[i]);
-	}
-}
+    bool firstIs(char isChar)
+    {
+        return firstC() == isChar;
+    }
 
-// counts how many times it appears
-uint str::count(const str s) const {
-	uint total = 0;
-	size_t end,pos = 0;
-	
-	while(true) {
-		end = find(s,pos);
-		if(end == string::npos)
-			break;
-		pos = end + s.size();
-		total++;
-	}
-	return total;
-}
+    char lastC()
+    {
+        const char* t = " \t\n\r\f\v";
+        return s[s.find_last_not_of(t)];
+    }
 
-bool str::islower() const {
-	bool Bool = true;
-	if (length() == 0)
-		Bool = false;
-	else {
-		for(const_iterator i = begin(); i != end(); i++) {
-			if(*i >= 'A' && *i <= 'Z') {
-				Bool = false;
-				break;
-			}
-		}
-	}
-	return Bool;
-}
+    bool lastIs(char isChar)
+    {
+        return lastC() == isChar;
+    }
 
-bool str::isupper() const {
-	bool Bool = true;
-	if (length() == 0)
-		Bool = false;
-	else {
-		for(const_iterator i = begin(); i != end(); i++) {
-			if(*i >= 'a' && *i <= 'z') {
-				Bool = false;
-				break;
-			}
-		}
-	}
-	return Bool;
-}
+    bool has(string find)
+    {
+        return s.find(find) != string::npos;
+    }
 
-bool str::isint() const {
-	bool Bool = true;
-	if (length() == 0)
-		Bool = false;
-	else {
-		for(const_iterator i = begin(); i != end(); i++) {
-			if(*i < '0' || *i > '9') {
-				Bool = false;
-				break;
-			}
-		}
-	}
-	return Bool;
-}
+    bool has(string find1, string find2)
+    {
+        return s.find(find1) != string::npos && s.find(find2) != string::npos;
+    }
 
-bool str::isfloat() const {
-	bool Bool = true;
-	if (length() == 0)
-		Bool = false;
-	else if( count(".") != 1 )
-		Bool = false;
-	else {
-		for(const_iterator i = begin(); i != end(); i++) {
-			if((*i < '0' || *i > '9') && *i != '.') {
-				Bool = false;
-				break;
-			}
-		}
-	}
-	return Bool;
-}
+    // "  Hello World  " -> "Hello World"
+    string trim(const string& whitespace = " \t")
+    {
+        const auto strBegin = s.find_first_not_of(whitespace);
+        if (strBegin == string::npos) return "";
 
-bool str::isalpha() const {
-	bool Bool = true;
-	if (length() == 0)
-		Bool = false;
-	else {
-		for(const_iterator i = begin(); i != end(); i++) {
-			if((*i < 'a' || *i > 'z') && (*i < 'A' || *i > 'Z') && *i != ' ') {
-				Bool = false;
-				break;
-			}
-		}
-	}
-	return Bool;
-}
+        const auto strEnd = s.find_last_not_of(whitespace);
+        const auto strRange = strEnd - strBegin + 1;
 
-str str::lower() {
-	for(iterator i = begin(); i != end(); i++) {
-		if(*i >= 'A' && *i <= 'Z') 
-			*i += ('a' - 'A');
-	}
-	return *this;
-}
+        return s.substr(strBegin, strRange);
+    }
 
-str str::upper() {
-	for(iterator i = begin(); i != end(); i++) {
-		if(*i >= 'a' && *i <= 'z') 
-			*i -= ('a' - 'A');
-	}
-	return *this;
-}
+    // "str, int | str, str | int" -> [str, int], [str, str], [int]
+    vector<string> split(char splitOn)
+    {
+        string tmp; 
+        stringstream ss(s);
+        vector<string> seglist;
+
+        while(getline(ss, tmp, splitOn)){
+            seglist.push_back(tmp);
+        }
+        
+        return seglist;
+    }
+
+    string returnsOut()
+    {
+        return s.substr(s.find("return") + 7);
+    }
+
+    // get values inside first set of ( )
+    string returnsIn()
+    {
+        return s.substr(s.find("(") + 1, s.find(")") - 5);
+    }
+
+    // (str, int, int)returnBack(int x) -> returnBack(int x)
+    string funcAndArgsIn()
+    {
+        return s.substr(s.find(")") + 1);
+    }
+
+    string getBefore(string until)
+    {
+        return s.substr(0, s.find(until));
+    }
+    string getAfter(string after)
+    {
+        return s.substr(s.find(after) + after.length());
+    }
+
+    // int k = holdingTuple<1> with < and > would reutrn 1
+    string extractBetween(string start, string end)
+    {
+        return s.substr(s.find(start) + start.length(), s.find(end) - s.find(start) - (start.length() - end.length()) - 1);
+    }
+
+    string replace(string find, string replace)
+    {
+        int pos = s.find(find);
+        string replacedString = s;
+        while (pos != string::npos)
+        {
+            replacedString.replace(pos, find.length(), replace);
+            pos = replacedString.find(find);
+        }
+        return replacedString;
+    }
+
+    // get vairable names from string "int height, double width, string name" -> "height, width, name"
+    string getReturnNames()
+    {
+        string returns = s;
+        string returnNames = "";
+
+        int start = 0;
+        for (int i = 0; i < returns.length(); i++)
+        {
+            if (returns[i] == ' ')
+                start = i + 1;
+            else if (returns[i] == ',')
+                returnNames += returns.substr(start, i - start) + ", ";
+        }
+        returnNames += returns.substr(start);
+
+        return returnNames;
+    }
+
+    // get vairable types from string "int height, double width, string name" -> "int, double, string"
+    string getReturnTypes()
+    {
+        string returns = s;
+        string returnTypes = "";
+
+        int start = 0;
+        for (int i = 0; i < returns.length(); i++)
+        {
+            if (returns[i] == ' ')
+                returnTypes += returns.substr(start + 1, i) + ",";
+            else if (returns[i] == ',')
+                start = i + 1;
+        }
+        returnTypes += returns.substr(start);
+
+        return returnTypes;
+    }
+};

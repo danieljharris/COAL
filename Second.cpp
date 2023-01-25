@@ -19,24 +19,35 @@ variant<tuple<str, int>, tuple<str, str>> giveVariant2(int in)
 
 variant<int, str> giveVariant3(int in)
 {
-    return make_tuple("ok", 10);
-    return make_tuple("ok", 88);
-    return make_tuple("error", "unexpected_int");
+    if (in == 1) return "ok";
+    if (in == 2) return 88;
+    else         return "error";
 }
 
 variant<int, tuple<str, int>> giveVariant4(int in)
 {
     return make_tuple("ok", 10);
     return make_tuple("ok", 88);
-    return make_tuple("error", "unexpected_int");
+    else         return 0;
 }
 
 int main()
 {
-    str; int | str; str;
-    tie(str, str, str) = giveVariant2(1);
 
 
+
+
+
+
+//PLACE HOLDER
+
+
+
+(
+pattern(as<    lit ok; int variInt) =>;
+    tie(ok, =>) =  => println("ok: " + variInt);
+pattern(as<    lit error; lit msg)  =;
+    tie(error, =) =   => println("error: " + msg);
 
 
     return 0;

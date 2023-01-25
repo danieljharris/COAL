@@ -143,7 +143,7 @@ void burnCoalInside(string line, ofstream &out)
             {
                 // (str, int | str, str)giveVariant2(1)
 
-                out << "PLACE HOLDER";
+                out << "//PLACE HOLDER";
             }
             else if (l.has("="))
             {
@@ -202,52 +202,45 @@ void burnCoalOutside(string line, ofstream &out)
             out << "void ";
             out << funcAndArgs;
         }
-        else if (returns.has(","))
-        {
-            if (returns.has("|"))
-            {
-                out << "variant<";
-
-                vector<string> types = returns.split('|');
-
-                int index = 1;
-                for (string seg : types)
-                {
-                    if (str(seg).has(","))
-                        out << "tuple<" << seg << ">";
-                    else
-                        out << seg;
-
-                    // Only put , between segments and not at the end
-                    if (index != types.size()) out << ", ";
-                    index++;
-                }
-
-                out << "> " << funcAndArgs;
-            }
-            else
-            {
-                out << "tuple<";
-                out << line.substr(1, line.find(")") - 1);
-                out << "> " << funcAndArgs;
-            }
-        }
-        else if (l.has("|"))
+        else if (returns.has(",", "|"))
         {
             out << "variant<";
 
             vector<string> types = returns.split('|');
 
-            int index = 1;
-            for (string seg : types)
+            int i = 1;
+            for(string seg : types)
             {
-                out << seg;
+                str s = (str(seg).trim());
+                if (s.has(","))
+                {
+                    out << "tuple<";
+                    out << s.s;
+                    out << ">";
+                }
+                else
+                {
+                    out << s.s;
+                }
 
-                // Only put , between segments and not at the end
-                if (index != types.size()) out << ", ";
-                index++;
+                if(i < types.size()) out << ", ";
+                i++;
             }
 
+            // out << "variant<tuple<";
+            // out << returns.replace(" | ", ">, tuple<");
+            out << "> " << funcAndArgs;
+        }
+        else if (returns.has(","))
+        {
+            out << "tuple<";
+            out << line.substr(1, line.find(")") - 1);
+            out << "> " << funcAndArgs;
+        }
+        else if (l.has("|"))
+        {
+            out << "variant<";
+            out << returns.replace(" |", ",");
             out << "> " << funcAndArgs;
         }
         else
@@ -270,8 +263,8 @@ int main()
     bool insideFunction = false;
     int depth = 0;
 
-    string file = "First";
-    // string file = "Second";
+    //string file = "First";
+    string file = "Second";
 
     ifstream in(file + ".co");
     ofstream out(file + ".cpp");
