@@ -13,14 +13,13 @@ bool isInsideMatch = false;
 string boilerPlate()
 {
 return
-
 "#include <iostream> \n\
 #include <variant> \n\
 #include <tuple> \n\
 #include <cstdio> \n\
 #include \"mpark/patterns.hpp\" \n\
 using namespace std; \n\
-using namespace mpark::patterns; \n\
+using namespace mpark::patterns; \n\n\
 using str = std::string; \n\
 template <typename T> \n\
 void println(T var) { cout << var << endl; } \n\
@@ -143,7 +142,7 @@ void burnCoalInside(string line, ofstream &out)
             {
                 // (str, int | str, str)giveVariant2(1)
 
-                out << "//PLACE HOLDER";
+                out << "//PLACE HOLDER 1";
             }
             else if (l.has("="))
             {
@@ -165,14 +164,15 @@ void burnCoalInside(string line, ofstream &out)
         else
         {
             if (returns.has("|"))
-                out << "PLACE HOLDER";
+                out << "//PLACE HOLDER 2";
             else
                 out << "    " << returns.s << " = " <<  l.funcAndArgsIn() << ";\n";
         }
     }
     else if (l.has("return", ","))
     {
-        out << "    return make_tuple(" << l.returnsOut() << ");\n";
+        out << l.getBefore("return");
+        out << "return make_tuple(" << l.returnsOut() << ");\n";
     }
     else if (l.lastIs('>'))
     {

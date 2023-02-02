@@ -1,0 +1,34 @@
+(int)main()
+{
+
+
+
+
+    public List<Software>      Software      {get; set;} = new List<Software>();
+    public List<Hardware>      Hardware      {get; set;} = new List<Hardware>();
+    public List<DataSources>   DataSources   {get; set;} = new List<DataSources>();
+    public List<AttackVectors> AttackVectors {get; set;} = new List<AttackVectors>();
+
+    
+    Struct listOfObjs = "List<$Type> $Name {get; set;} = new List<$Type>()";
+    Accessor listOfObjsAccessor = public;
+    List<Types> listOfObjsTypes = new List<Types>() {Software, Hardware, DataSources, AttackVectors};
+
+
+
+
+    // (str, int | str, str)giveVariant2(1)
+
+
+
+    (str, int | str, str) myVari = giveVariant2(1)
+
+
+    match (testing123)
+    {
+        (lit ok, int variInt) => println("ok: " + variInt)
+        (lit error, lit msg)  => println("error: " + msg)
+    }
+
+    return 0
+}
