@@ -238,6 +238,8 @@ int main()
 
     // (int | str)giveVariant2(1)
     variant<int, string> varTuple = 542;
+
+    variant<tuple<string,int>, tuple<string, string>> myVari = make_tuple("test", 66);
     
 
 
