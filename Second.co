@@ -25,7 +25,7 @@
     // (str, int | str, str)giveVariant2(1)
 
 
-
+    // variant<tuple<string,int>, tuple<string, string>> myVari = make_tuple("test", 66);
     (str, int | str, str) myVari = giveVariant2(1)
 
 

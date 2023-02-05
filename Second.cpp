@@ -38,17 +38,16 @@ int main()
 
 
 
+    variant<tuple<str, int>, tuple<str, str>> myVari = giveVariant2(1);
 
-
-//PLACE HOLDER 1
 
 
 
 (
-pattern(as<    lit ok; int variInt) =>;
-    tie(ok, =>) =  => println("ok: " + variInt);
-pattern(as<    lit error; lit msg)  =;
-    tie(error, =) =   => println("error: " + msg);
+pattern(as<    lit ok; int variInt;
+    tie(ok, variInt) =  => println("ok: " + variInt);
+pattern(as<    lit error; lit msg;
+    tie(error, msg) =   => println("error: " + msg);
 
 
     return 0;

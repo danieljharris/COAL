@@ -85,15 +85,16 @@ public:
     }
 
     // get values inside first set of ( )
-    string returnsIn()
+    string returns()
     {
-        return s.substr(s.find("(") + 1, s.find(")") - 5);
+        //return s.substr(s.find("(") + 1, s.find(")") - 5);
+        return extractBetween("(", ")");
     }
 
     // (str, int, int)returnBack(int x) -> returnBack(int x)
-    string funcAndArgsIn()
+    string afterReturns()
     {
-        return s.substr(s.find(")") + 1);
+        return getAfter(")");
     }
 
     string getBefore(string until)

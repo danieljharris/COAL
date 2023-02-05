@@ -57,6 +57,8 @@ class lit : public string {};\n\
 //     return returnNames;
 // }
 
+
+
 void insideMatch(str l, ofstream &out)
 {
     if (l.has("}")) isInsideMatch = false;
@@ -68,7 +70,7 @@ void insideMatch(str l, ofstream &out)
     {
         out << "pattern(as<";
 
-        str returns = str(l.returnsIn());
+        str returns = str(l.returns());
         string returnsTypes = returns.getReturnTypes();
 
         if (!l.has(","))
@@ -80,7 +82,7 @@ void insideMatch(str l, ofstream &out)
             out << "    " << returns.replace(",", ";") << ";\n";
             out << "    ";
             out << "tie(" << returns.getReturnNames() << ") = ";
-            out << l.funcAndArgsIn() << ";\n";
+            out << l.afterReturns() << ";\n";
         }
     }
 
@@ -102,6 +104,7 @@ void insideMatch(str l, ofstream &out)
 void burnCoalInside(string line, ofstream &out)
 {
     str l(line);
+    
     // Match
     if (l.has("match")) isInsideMatch = true;
     else if (isInsideMatch) insideMatch(l, out);
@@ -114,59 +117,56 @@ void burnCoalInside(string line, ofstream &out)
         // int x; int y; int z;
         // tie(x, y, z) = returnBack(10);
 
-        str returns = str(l.returnsIn());
+        str returns = str(l.returns());
 
-        // else
-        // {
-        //     vector<string> types = split(returns, '|');
-
-        //     int index = 1;
-        //     for (string seg : types)
-        //     {
-        //         if (has(seg, ","))
-        //             out << "tuple<" << seg << ">";
-        //         else
-        //             out << seg;
-
-        //         // Only put , between segments and not at the end
-        //         if (index != types.size()) out << ", ";
-        //         index++;
-        //     }
-
-        //     out << "> ";
-        // }
-
-        if (returns.has(","))
+        if (returns.has(",", "|"))
         {
-            if (returns.has("|"))
-            {
-                // (str, int | str, str)giveVariant2(1)
+            out << "    variant<";
 
-                out << "//PLACE HOLDER 1";
-            }
-            else if (l.has("="))
-            {
-                // (int, int) holdingTuple = myDoubleFunction()
-                // tuple<int, int> holdingTuple = myDoubleFunction()
+            vector<string> types = returns.split('|');
 
-                // out << "tuple<" << split(returns, ',') << "> ";
-                out << "    tuple<" << returns.getReturnTypes() << ">";
-                out << l.funcAndArgsIn() << ";\n";
-            }
-            else
+            int i = 1;
+            for(string seg : types)
             {
-                out << "    " << returns.replace(",", ";") << ";\n";
-                out << "    ";
-                out << "tie(" << returns.getReturnNames() << ") = ";
-                out << l.funcAndArgsIn() << ";\n";
+                str s = (str(seg).trim());
+                if (s.has(","))
+                {
+                    out << "tuple<";
+                    out << s.s;
+                    out << ">";
+                }
+                else
+                {
+                    out << s.s;
+                }
+
+                if(i < types.size()) out << ", ";
+                i++;
             }
+            out << ">" << l.afterReturns() << ";\n";
+        }
+        else if (returns.has(",") && l.has("="))
+        {
+            // (int, int) holdingTuple = myDoubleFunction()
+            // tuple<int, int> holdingTuple = myDoubleFunction()
+
+            // out << "tuple<" << split(returns, ',') << "> ";
+            out << "    tuple<" << returns.getReturnTypes() << ">";
+            out << l.afterReturns() << ";\n";
+        }
+        else if (returns.has(","))   
+        {
+            out << "    " << returns.replace(",", ";") << ";\n";
+            out << "    ";
+            out << "tie(" << returns.getReturnNames() << ") = ";
+            out << l.afterReturns() << ";\n";
         }
         else
         {
             if (returns.has("|"))
                 out << "//PLACE HOLDER 2";
             else
-                out << "    " << returns.s << " = " <<  l.funcAndArgsIn() << ";\n";
+                out << "    " << returns.s << " = " <<  l.afterReturns() << ";\n";
         }
     }
     else if (l.has("return", ","))
@@ -192,20 +192,19 @@ void burnCoalInside(string line, ofstream &out)
 void burnCoalOutside(string line, ofstream &out)
 {
     str l = str(line);
-    if (line[0] == '(')
+    if (l.firstIs('('))
     {
-        str returns = str(line.substr(1, line.find(")") - 1));
-        string funcAndArgs = line.substr(line.find(")") + 1);
+        str returns = l.returns();
+        string rest = l.getAfter(")");
 
         if (returns.s.length() == 0)
         {
             out << "void ";
-            out << funcAndArgs;
         }
         else if (returns.has(",", "|"))
         {
             out << "variant<";
-
+            
             vector<string> types = returns.split('|');
 
             int i = 1;
@@ -218,37 +217,32 @@ void burnCoalOutside(string line, ofstream &out)
                     out << s.s;
                     out << ">";
                 }
-                else
-                {
-                    out << s.s;
-                }
+                else out << s.s;
 
                 if(i < types.size()) out << ", ";
                 i++;
             }
-
-            // out << "variant<tuple<";
-            // out << returns.replace(" | ", ">, tuple<");
-            out << "> " << funcAndArgs;
+            out << "> ";
         }
         else if (returns.has(","))
         {
             out << "tuple<";
             out << line.substr(1, line.find(")") - 1);
-            out << "> " << funcAndArgs;
+            out << "> ";
         }
         else if (l.has("|"))
         {
             out << "variant<";
             out << returns.replace(" |", ",");
-            out << "> " << funcAndArgs;
+            out << "> ";
         }
         else
         {
             out << line.substr(1, line.find(")") - 1);
             out << " ";
-            out << funcAndArgs;
         }
+
+        out << rest;
     }
     else
     {
