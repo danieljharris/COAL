@@ -54,10 +54,10 @@ public:
     }
 
     // "  Hello World  " -> "Hello World"
-    string trim(const string& whitespace = " \t")
+    str trim(const string& whitespace = " \t")
     {
         const auto strBegin = s.find_first_not_of(whitespace);
-        if (strBegin == string::npos) return "";
+        if (strBegin == string::npos) return str();
 
         const auto strEnd = s.find_last_not_of(whitespace);
         const auto strRange = strEnd - strBegin + 1;
@@ -66,11 +66,11 @@ public:
     }
 
     // "str, int | str, str | int" -> [str, int], [str, str], [int]
-    vector<string> split(char splitOn)
+    vector<str> split(char splitOn)
     {
         string tmp; 
         stringstream ss(s);
-        vector<string> seglist;
+        vector<str> seglist;
 
         while(getline(ss, tmp, splitOn)){
             seglist.push_back(tmp);
@@ -79,40 +79,40 @@ public:
         return seglist;
     }
 
-    string returnsOut()
+    str returnsOut()
     {
         return s.substr(s.find("return") + 7);
     }
 
     // get values inside first set of ( )
-    string returns()
+    str returns()
     {
         //return s.substr(s.find("(") + 1, s.find(")") - 5);
         return extractBetween("(", ")");
     }
 
     // (str, int, int)returnBack(int x) -> returnBack(int x)
-    string afterReturns()
+    str afterReturns()
     {
         return getAfter(")");
     }
 
-    string getBefore(string until)
+    str getBefore(string until)
     {
         return s.substr(0, s.find(until));
     }
-    string getAfter(string after)
+    str getAfter(string after)
     {
         return s.substr(s.find(after) + after.length());
     }
 
     // int k = holdingTuple<1> with < and > would reutrn 1
-    string extractBetween(string start, string end)
+    str extractBetween(string start, string end)
     {
         return s.substr(s.find(start) + start.length(), s.find(end) - s.find(start) - (start.length() - end.length()) - 1);
     }
 
-    string replace(string find, string replace)
+    str replace(string find, string replace)
     {
         int pos = s.find(find);
         string replacedString = s;
@@ -125,7 +125,7 @@ public:
     }
 
     // get vairable names from string "int height, double width, string name" -> "height, width, name"
-    string getReturnNames()
+    str getReturnNames()
     {
         string returns = s;
         string returnNames = "";
@@ -144,7 +144,7 @@ public:
     }
 
     // get vairable types from string "int height, double width, string name" -> "int, double, string"
-    string getReturnTypes()
+    str getReturnTypes()
     {
         string returns = s;
         string returnTypes = "";
@@ -160,5 +160,11 @@ public:
         returnTypes += returns.substr(start);
 
         return returnTypes;
+    }
+
+    friend ostream& operator<<(ostream& output, const str& stringOut)
+    {
+        output << stringOut.s;
+        return output;
     }
 };

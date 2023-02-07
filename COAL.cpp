@@ -71,7 +71,7 @@ void insideMatch(str l, ofstream &out)
         out << "pattern(as<";
 
         str returns = str(l.returns());
-        string returnsTypes = returns.getReturnTypes();
+        str returnsTypes = returns.getReturnTypes();
 
         if (!l.has(","))
         {
@@ -123,12 +123,12 @@ void burnCoalInside(string line, ofstream &out)
         {
             out << "    variant<";
 
-            vector<string> types = returns.split('|');
+            vector<str> types = returns.split('|');
 
             int i = 1;
-            for(string seg : types)
+            for(str seg : types)
             {
-                str s = (str(seg).trim());
+                str s = seg.trim();
                 if (s.has(","))
                 {
                     out << "tuple<";
@@ -195,7 +195,7 @@ void burnCoalOutside(string line, ofstream &out)
     if (l.firstIs('('))
     {
         str returns = l.returns();
-        string rest = l.getAfter(")");
+        str rest = l.getAfter(")");
 
         if (returns.s.length() == 0)
         {
@@ -205,12 +205,12 @@ void burnCoalOutside(string line, ofstream &out)
         {
             out << "variant<";
             
-            vector<string> types = returns.split('|');
+            vector<str> types = returns.split('|');
 
             int i = 1;
-            for(string seg : types)
+            for(str seg : types)
             {
-                str s = (str(seg).trim());
+                str s = seg.trim();
                 if (s.has(","))
                 {
                     out << "tuple<";
@@ -265,22 +265,23 @@ int main()
 
     out << boilerPlate();
 
-    for (string line; getline(in, line); )
+    for (string line; getline(in, line);)
     {
-        if (str(line).firstIs('/')) continue; //Skips over comments
+        str l = str(line);
+        if (l.firstIs('/')) continue; //Skips over comments
 
         if (insideFunction && line.length() == 0)
         {
             out << endl;
         }
-        else if (line[0] == '{')
+        else if (l.firstIs('{'))
         {
             out << "\n{\n";
             insideFunction = true;
             depth++;
             continue;
         }
-        else if (line[0] == '}')
+        else if (l.firstIs('}'))
         {
             out << "}\n";
             depth--;
