@@ -82,13 +82,13 @@ void insideMatch(str l, ofstream &out)
 
         if (!l.has(","))
         {
-            out << returnsTypes << ">(arg)) = [](" << returns << ") {";
+            out << returnsTypes << ">(arg) = [](" << returns << ")) {";
         }
         else
         {
             out << "tuple<";
             // TODO: Change number of args with number of tuples
-            out << returnsTypes << ">>(ds(arg, arg)) = [](" << returns << ") {";
+            out << returnsTypes << ">>(ds(arg, arg))) = [](" << returns << ") {";
             //out << returns.replace(",", ";");
             // out << "tie(" << returns.getReturnNames() << ") = ";
             // out << l.afterReturns() << ";\n";
