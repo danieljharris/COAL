@@ -219,7 +219,7 @@ int main()
 
     // variant<tuple<int, str>, tuple<str, str>, int> varTuple = make_tuple(101, "hello");
     // variant<tuple<int, str>, tuple<str, str>, int> varTuple = make_tuple("test", "bob");
-    // variant<tuple<int, str>, tuple<str, str>, int> varTuple = 542;
+    variant<tuple<int, str>, tuple<str, str>, int> varTuple = 542;
 
     // match (litVari)
     // {
@@ -228,18 +228,19 @@ int main()
     //     (int x) => cout << "int: " << x << "\n"
     // }
 
-    // match(varTuple)
-    // (
-    //     pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
-    //     pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; },
-    //     pattern(as<int>(arg))                      = [](int x) { cout << "int: " << x << "\n"; }
-    // );
+    match (varTuple)
+    (
+        pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
+        pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; },
+        pattern(as<int>(arg))                      = [](int x) { cout << "int: " << x << "\n"; }
+    );
 
 
     // (int | str)giveVariant2(1)
-    variant<int, string> varTuple = 542;
 
-    variant<tuple<string,int>, tuple<string, string>> myVari = make_tuple("test", 66);
+    // variant<int, string> varTuple = 542;
+
+    // variant<tuple<string,int>, tuple<string, string>> myVari = make_tuple("test", 66);
     
 
 

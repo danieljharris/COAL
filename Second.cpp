@@ -43,11 +43,15 @@ int main()
 
 
 
-(
-pattern(as<    lit ok; int variInt;
-    tie(ok, variInt) =  => println("ok: " + variInt);
-pattern(as<    lit error; lit msg;
-    tie(error, msg) =   => println("error: " + msg);
+    variant<tuple<int, str>, tuple<str, str>, int> varTuple = 542;
+
+
+    match (varTuple)
+    (
+        pattern(as<tuple<int, str>>(ds(arg, arg)) = [](int i, str s) { println("int, str: " + i + " - " + s); }
+        pattern(as<tuple<str, str>>(ds(arg, arg)) = [](str s1, str s2) { println("str, str: " + s1 + " - " + s2); }
+        pattern(as<int>(arg)) = [](int x) { println("int: " + x); }
+    );
 
 
     return 0;

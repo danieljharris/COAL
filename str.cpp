@@ -53,9 +53,19 @@ public:
         return s.find(find1) != string::npos && s.find(find2) != string::npos;
     }
 
-    // "  Hello World  " -> "Hello World"
-    str trim(const string& whitespace = " \t")
+    str getSpacing()
     {
+        const string& whitespace = " \t";
+        const auto strBegin = s.find_first_not_of(whitespace);
+        if (strBegin == string::npos) return str();
+
+        return s.substr(0, strBegin);
+    }
+
+    // "  Hello World  " -> "Hello World"
+    str trim()
+    {
+        const string& whitespace = " \t";
         const auto strBegin = s.find_first_not_of(whitespace);
         if (strBegin == string::npos) return str();
 
@@ -146,6 +156,8 @@ public:
     // get vairable types from string "int height, double width, string name" -> "int, double, string"
     str getReturnTypes()
     {
+        if (!has(",")) return getBefore(" ");
+
         string returns = s;
         string returnTypes = "";
 
@@ -153,11 +165,14 @@ public:
         for (int i = 0; i < returns.length(); i++)
         {
             if (returns[i] == ' ')
-                returnTypes += returns.substr(start + 1, i) + ",";
+                returnTypes += returns.substr(start, i - start);
             else if (returns[i] == ',')
+            {
                 start = i + 1;
+                returnTypes += ",";
+            }
         }
-        returnTypes += returns.substr(start);
+        //returnTypes += returns.substr(start);
 
         return returnTypes;
     }

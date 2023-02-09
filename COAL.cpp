@@ -8,7 +8,7 @@
 
 using namespace std;
 
-bool isInsideMatch = false;
+bool matchLit = false;
 
 string boilerPlate()
 {
@@ -61,29 +61,40 @@ class lit : public string {};\n\
 
 void insideMatch(str l, ofstream &out)
 {
-    if (l.has("}")) isInsideMatch = false;
+    // out << ".";
+    out << l.getSpacing();
+
+    if (l.firstIs('}'))
+    {
+        matchLit = false;
+        out << ");" << "\n";
+        return;
+    }
 
     else if (l.firstIs('{')) out << "(" << "\n";
-    else if (l.firstIs('}')) out << ");" << "\n";
 
     else if (l.firstIs('('))
     {
         out << "pattern(as<";
 
-        str returns = str(l.returns());
+        str returns = l.returns();
         str returnsTypes = returns.getReturnTypes();
 
         if (!l.has(","))
         {
-            out << "    " << "    " << returnsTypes << ">(arg)) = [](" << returns.s << ") {" << ";\n";
+            out << returnsTypes << ">(arg)) = [](" << returns << ") {";
         }
         else
         {
-            out << "    " << returns.replace(",", ";") << ";\n";
-            out << "    ";
-            out << "tie(" << returns.getReturnNames() << ") = ";
-            out << l.afterReturns() << ";\n";
+            out << "tuple<";
+            // TODO: Change number of args with number of tuples
+            out << returnsTypes << ">>(ds(arg, arg)) = [](" << returns << ") {";
+            //out << returns.replace(",", ";");
+            // out << "tie(" << returns.getReturnNames() << ") = ";
+            // out << l.afterReturns() << ";\n";
         }
+
+        out << l.getAfter("=>") << "; }\n";
     }
 
     // match (litVari)
@@ -106,8 +117,12 @@ void burnCoalInside(string line, ofstream &out)
     str l(line);
     
     // Match
-    if (l.has("match")) isInsideMatch = true;
-    else if (isInsideMatch) insideMatch(l, out);
+    if (l.has("match"))
+    {
+        matchLit = true;
+        out << l << "\n";
+    }
+    else if (matchLit) insideMatch(l, out);
 
     // Returns Conversions, for tuple and tie
     else if (l.firstIs('('))
@@ -274,14 +289,14 @@ int main()
         {
             out << endl;
         }
-        else if (l.firstIs('{'))
+        else if (l.firstIs('{') && !matchLit)
         {
             out << "\n{\n";
             insideFunction = true;
             depth++;
             continue;
         }
-        else if (l.firstIs('}'))
+        else if (l.firstIs('}') && !matchLit)
         {
             out << "}\n";
             depth--;

@@ -29,10 +29,13 @@
     (str, int | str, str) myVari = giveVariant2(1)
 
 
-    match (testing123)
+    (int, str | str, str | int) varTuple = 542
+
+    match (varTuple)
     {
-        (lit ok, int variInt) => println("ok: " + variInt)
-        (lit error, lit msg)  => println("error: " + msg)
+        (int i, str s) => println("int, str: " + i + " - " + s)
+        (str s1, str s2)  => println("str, str: " + s1 + " - " + s2)
+        (int x) => println("int: " + x)
     }
 
     return 0
