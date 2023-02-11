@@ -330,11 +330,7 @@ int main()
         else                burnCoalOutside(line, out);
     }
 
-    //out << "\n    return 0;\n}";
-
-    //out << outFile;
     out.close();
-
 
     system(("g++ -std=c++20 " + file + ".cpp -o " + file).c_str());
     system(("./" + file).c_str());

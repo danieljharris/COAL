@@ -39,6 +39,7 @@
     println(third)
     println("--------------------")
 
+    // Tuple extraction
     (int, int) holdingTuple = myDoubleFunction()
     int u = holdingTuple<0>
     int k = holdingTuple<1>
