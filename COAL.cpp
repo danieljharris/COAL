@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include "LineIn.cpp"
+#include "FileOut.cpp"
 
 using namespace std;
 
@@ -61,20 +62,38 @@ class lit : public string {};\n\
 
 void insideMatch(str l, ofstream &out)
 {
-    // out << ".";
-    out << l.getSpacing();
+    static bool started = true;
 
     if (l.firstIs('}'))
     {
+        out << "\n";
+        out << l.getSpacing();
+
         matchLit = false;
+
         out << ");" << "\n";
         return;
     }
 
-    else if (l.firstIs('{')) out << "(" << "\n";
+    else if (l.firstIs('{'))
+    {
+        out << l.getSpacing();
+        out << "(" << "\n";
+    }
 
     else if (l.firstIs('('))
     {
+        if(started)
+        {
+            started = false;
+        }
+        else
+        {
+            out << ",";
+            out << "\n";
+        }
+        out << l.getSpacing();
+
         out << "pattern(as<";
 
         str returns = l.returns();
@@ -82,19 +101,21 @@ void insideMatch(str l, ofstream &out)
 
         if (!l.has(","))
         {
-            out << returnsTypes << ">(arg) = [](" << returns << ")) {";
+            out << returnsTypes << ">(arg)) = [](" << returns << ") {";
         }
         else
         {
-            out << "tuple<";
-            // TODO: Change number of args with number of tuples
-            out << returnsTypes << ">>(ds(arg, arg))) = [](" << returns << ") {";
-            //out << returns.replace(",", ";");
-            // out << "tie(" << returns.getReturnNames() << ") = ";
-            // out << l.afterReturns() << ";\n";
+            out << "tuple<"<< returnsTypes << ">>(ds(arg";
+            
+            // Adds on to arg list for each vairable
+            int returnAmounts = returns.getReturnAmount();
+            for(int i = 1; i < returnAmounts; i++)
+                out << ", arg";
+
+            out << "))) = [](" << returns << ") {";
         }
 
-        out << l.getAfter("=>") << "; }\n";
+        out << l.getAfter("=>") << "; }";
     }
 
     // match (litVari)
@@ -277,6 +298,7 @@ int main()
 
     ifstream in(file + ".co");
     ofstream out(file + ".cpp");
+    //FileOut outFile;
 
     out << boilerPlate();
 
@@ -287,7 +309,7 @@ int main()
 
         if (insideFunction && line.length() == 0)
         {
-            out << endl;
+            out << "\n";
         }
         else if (l.firstIs('{') && !matchLit)
         {
@@ -310,7 +332,9 @@ int main()
 
     //out << "\n    return 0;\n}";
 
+    //out << outFile;
     out.close();
+
 
     system(("g++ -std=c++20 " + file + ".cpp -o " + file).c_str());
     system(("./" + file).c_str());

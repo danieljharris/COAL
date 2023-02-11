@@ -176,6 +176,20 @@ public:
 
         return returnTypes;
     }
+    int getReturnAmount()
+    {
+        int amount = 0;
+        if (!has(",")) return amount;
+        amount++;
+
+        string returns = getReturnTypes().s;
+
+        for (int i = 0; i < returns.length(); i++)
+            if (returns[i] == ',')
+                amount++;
+
+        return amount;
+    }
 
     friend ostream& operator<<(ostream& output, const str& stringOut)
     {

@@ -29,13 +29,14 @@
     (str, int | str, str) myVari = giveVariant2(1)
 
 
-    (int, str | str, str | int) varTuple = 542
+    (int, str | str, str | int | int, str, str) varTuple = 54
 
     match (varTuple)
     {
-        (int i, str s) => println("int, str: " + i + " - " + s)
-        (str s1, str s2)  => println("str, str: " + s1 + " - " + s2)
-        (int x) => println("int: " + x)
+        (int i, str s) => cout << "int, str: " << i << " - " << s << "\n"
+        (str s1, str s2) => cout << "str, str: " << s1 << " - " << s2 << "\n"
+        (int x) => cout << "int: " << x << "\n"
+        (int i, str s1, str s2) => cout << "Yolo"
     }
 
     return 0
