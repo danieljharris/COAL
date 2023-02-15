@@ -2,23 +2,25 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <list>
+#include <vector>
+#include "LineIn.cpp"
+#include "FileOut.cpp"
 
 using namespace std;
 
-template <typename T>
-void println(T var) { cout << var << endl; }
+bool matchLit = false;
 
 string boilerPlate()
 {
 return
-
 "#include <iostream> \n\
 #include <variant> \n\
 #include <tuple> \n\
 #include <cstdio> \n\
 #include \"mpark/patterns.hpp\" \n\
 using namespace std; \n\
-using namespace mpark::patterns; \n\
+using namespace mpark::patterns; \n\n\
 using str = std::string; \n\
 template <typename T> \n\
 void println(T var) { cout << var << endl; } \n\
@@ -30,134 +32,253 @@ class lit : public string {};\n\
 //";
 }
 
-char firstC(string str)
+// (str, int | str, str | int) -> [str, int], [str, str], [int]
+// string getVariantVars(string returns)
+// {
+//     list<string> variantVarList;
+//     string variantVars = "";
+
+//     int start = 0;
+//     for (int i = 0; i < returns.length(); i++)
+//     {
+//         if (returns[i] == '|')
+//         {
+//             variantVarList.push_back(variantVars);
+//             variantVars = "";
+//             continue;
+//         }
+
+//         if (returns[i] == ' ')
+//             start = i + 1;
+//         else if (returns[i] == ',')
+//             returnNames += returns.substr(start, i - start) + ", ";
+//     }
+//     returnNames += returns.substr(start);
+
+//     return returnNames;
+// }
+
+
+
+void insideMatch(str l, ofstream &out)
 {
-    const char* t = " \t\n\r\f\v";
-    return str[str.find_first_not_of(t)];
-}
-bool has(string str, string find)
-{
-    return str.find(find) != string::npos;
-}
-bool has(string str, string find1, string find2)
-{
-    return str.find(find1) != string::npos && str.find(find2) != string::npos;
-}
-string returnsOut(string str)
-{
-    return str.substr(str.find("return") + 7);
-}
-string returnsIn(string str)
-{
-    return str.substr(str.find("(") + 1, str.find(")") - 5);
-}
-string funcAndArgsIn(string str)
-{
-    return str.substr(str.find(")") + 1);
-}
-string replace(string str, string find, string replace)
-{
-    int pos = str.find(find);
-    while (pos != string::npos)
+    static bool started = true;
+
+    if (l.firstIs('}'))
     {
-        str.replace(pos, find.length(), replace);
-        pos = str.find(find);
+        out << "\n";
+        out << l.getSpacing();
+
+        matchLit = false;
+
+        out << ");" << "\n";
+        return;
     }
-    return str;
-}
 
-// get vairable names from string "int height, double width, string name" -> "height, width, name"
-string getReturnVars(string returns)
-{
-    string returnVars = "";
-
-    int start = 0;
-    for (int i = 0; i < returns.length(); i++)
+    else if (l.firstIs('{'))
     {
-        if (returns[i] == ' ')
-            start = i + 1;
-        else if (returns[i] == ',')
-            returnVars += returns.substr(start, i - start) + ", ";
+        out << l.getSpacing();
+        out << "(" << "\n";
     }
-    returnVars += returns.substr(start);
 
-    return returnVars;
+    else if (l.firstIs('('))
+    {
+        if(started)
+        {
+            started = false;
+        }
+        else
+        {
+            out << ",";
+            out << "\n";
+        }
+        out << l.getSpacing();
+
+        out << "pattern(as<";
+
+        str returns = l.returns();
+        str returnsTypes = returns.getReturnTypes();
+
+        if (!l.has(","))
+        {
+            out << returnsTypes << ">(arg)) = [](" << returns << ") {";
+        }
+        else
+        {
+            out << "tuple<"<< returnsTypes << ">>(ds(arg";
+            
+            // Adds on to arg list for each vairable
+            int returnAmounts = returns.getReturnAmount();
+            for(int i = 1; i < returnAmounts; i++)
+                out << ", arg";
+
+            out << "))) = [](" << returns << ") {";
+        }
+
+        out << l.getAfter("=>") << "; }";
+    }
+
+    // match (litVari)
+    // {
+    //     (int i, str s) => cout << "int, str: " << i << " - " << s << "\n"
+    //     (str s1, str s2) => cout << "str, str: " << s1 << " - " << s2 << "\n"
+    //     (int x) => cout << "int: " << x << "\n"
+    // }
+
+    // match(varTuple)
+    // (
+    //     pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
+    //     pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; },
+    //     pattern(as<int>(arg))                      = [](int x) { cout << "int: " << x << "\n"; }
+    // );
 }
 
 void burnCoalInside(string line, ofstream &out)
 {
-    if (firstC(line) == '(') // Returns Conversions, for tuple and tie
+    str l(line);
+    
+    // Match
+    if (l.has("match"))
     {
-        string returns = returnsIn(line);
+        matchLit = true;
+        out << l << "\n";
+    }
+    else if (matchLit) insideMatch(l, out);
 
-        if (!has(returns, ","))
+    // Returns Conversions, for tuple and tie
+    else if (l.firstIs('('))
+    {
+        // (int x, int y, int z)returnBack(10)
+
+        // int x; int y; int z;
+        // tie(x, y, z) = returnBack(10);
+
+        str returns = str(l.returns());
+
+        if (returns.has(",", "|"))
         {
-            out << "    " << returns << " = " << funcAndArgsIn(line) << ";\n";
+            out << "    variant<";
+
+            vector<str> types = returns.split('|');
+
+            int i = 1;
+            for(str seg : types)
+            {
+                str s = seg.trim();
+                if (s.has(","))
+                {
+                    out << "tuple<";
+                    out << s.s;
+                    out << ">";
+                }
+                else
+                {
+                    out << s.s;
+                }
+
+                if(i < types.size()) out << ", ";
+                i++;
+            }
+            out << ">" << l.afterReturns() << ";\n";
+        }
+        else if (returns.has(",") && l.has("="))
+        {
+            // (int, int) holdingTuple = myDoubleFunction()
+            // tuple<int, int> holdingTuple = myDoubleFunction()
+
+            // out << "tuple<" << split(returns, ',') << "> ";
+            out << "    tuple<" << returns.getReturnTypes() << ">";
+            out << l.afterReturns() << ";\n";
+        }
+        else if (returns.has(","))   
+        {
+            out << "    " << returns.replace(",", ";") << ";\n";
+            out << "    ";
+            out << "tie(" << returns.getReturnNames() << ") = ";
+            out << l.afterReturns() << ";\n";
         }
         else
         {
-            out << "    " << replace(returns, ",", ";") << ";\n";
-            out << "    ";
-            out << "tie(" << getReturnVars(returns) << ") = ";
-            out << funcAndArgsIn(line) << ";\n";
+            if (returns.has("|"))
+                out << "//PLACE HOLDER 2";
+            else
+                out << "    " << returns.s << " = " <<  l.afterReturns() << ";\n";
         }
     }
-    else if (has(line, "return", ","))
+    else if (l.has("return", ","))
     {
-        out << "    return make_tuple(" << returnsOut(line) << ");\n";
+        out << l.getBefore("return");
+        out << "return make_tuple(" << l.returnsOut() << ");\n";
     }
-    else if (has(line, "match"))
+    else if (l.lastIs('>'))
     {
-        match (varTuple)
-        {
-            (int i, str s) => cout << "int, str: " << i << " - " << s << "\n"
-            (str s1, str s2) => cout << "str, str: " << s1 << " - " << s2 << "\n"
-        }
-
-        match (varTuple)
-        (
-            pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
-            pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; }
-        );
-        
-
-
-
-
-
+        out << l.getBefore("=")
+            << "= get<" << l.extractBetween("<", ">")
+            << ">(" << l.extractBetween(" = ", "<")
+            << ");\n";
     }
     else
     {
-        out << line;
-        if (line.length() > 0) out << ";";
+        out << l.s;
+        if (l.s.length() > 0) out << ";";
         out << endl;
     }
 }
 
 void burnCoalOutside(string line, ofstream &out)
 {
-    if (line[0] == '(')
+    str l = str(line);
+    if (l.firstIs('('))
     {
-        string returns = line.substr(1, line.find(")") - 1);
-        string funcAndArgs = line.substr(line.find(")") + 1);
+        str returns = l.returns();
+        str rest = l.getAfter(")");
 
-        if (returns.length() == 0)
+        if (returns.s.length() == 0)
         {
             out << "void ";
-            out << funcAndArgs;
         }
-        else if (returns.find(",") == string::npos)
+        else if (returns.has(",", "|"))
         {
-            out << line.substr(1, line.find(")") - 1);
-            out << " ";
-            out << funcAndArgs;
+            out << "variant<";
+            
+            vector<str> types = returns.split('|');
+
+            int i = 1;
+            for(str seg : types)
+            {
+                str s = seg.trim();
+                if (s.has(","))
+                {
+                    out << "tuple<";
+                    out << s.s;
+                    out << ">";
+                }
+                else out << s.s;
+
+                if(i < types.size()) out << ", ";
+                i++;
+            }
+            out << "> ";
         }
-        else
+        else if (returns.has(","))
         {
             out << "tuple<";
             out << line.substr(1, line.find(")") - 1);
-            out << "> " << funcAndArgs;
+            out << "> ";
         }
+        else if (l.has("|"))
+        {
+            out << "variant<";
+            out << returns.replace(" |", ",");
+            out << "> ";
+        }
+        else
+        {
+            out << line.substr(1, line.find(")") - 1);
+            out << " ";
+        }
+
+        out << rest;
     }
     else
     {
@@ -172,25 +293,32 @@ int main()
     bool insideFunction = false;
     int depth = 0;
 
-    ifstream in("First.co");
-    ofstream out("First.cpp");
+    //string file = "First";
+    string file = "Second";
+
+    ifstream in(file + ".co");
+    ofstream out(file + ".cpp");
+    //FileOut outFile;
 
     out << boilerPlate();
 
-    for (string line; getline(in, line); )
+    for (string line; getline(in, line);)
     {
+        str l = str(line);
+        if (l.firstIs('/')) continue; //Skips over comments
+
         if (insideFunction && line.length() == 0)
         {
-            out << endl;
+            out << "\n";
         }
-        else if (line[0] == '{')
+        else if (l.firstIs('{') && !matchLit)
         {
             out << "\n{\n";
             insideFunction = true;
             depth++;
             continue;
         }
-        else if (line[0] == '}')
+        else if (l.firstIs('}') && !matchLit)
         {
             out << "}\n";
             depth--;
@@ -198,18 +326,18 @@ int main()
             continue;
         }
 
-        if (insideFunction)
-            burnCoalInside(line, out);
-        else
-            burnCoalOutside(line, out);
+        if (insideFunction) burnCoalInside(line, out);
+        else                burnCoalOutside(line, out);
     }
 
     //out << "\n    return 0;\n}";
 
+    //out << outFile;
     out.close();
 
-    system("g++ -std=c++11 First.cpp -o First");
-    system("./First");
+
+    system(("g++ -std=c++20 " + file + ".cpp -o " + file).c_str());
+    system(("./" + file).c_str());
 
     return 0;
 }
