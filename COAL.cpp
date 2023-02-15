@@ -13,8 +13,13 @@ string boilerPlate()
 return
 
 "#include <iostream> \n\
+#include <variant> \n\
 #include <tuple> \n\
+#include <cstdio> \n\
+#include \"mpark/patterns.hpp\" \n\
 using namespace std; \n\
+using namespace mpark::patterns; \n\
+using str = std::string; \n\
 template <typename T> \n\
 void println(T var) { cout << var << endl; } \n\
 class lit : public string {};\n\
@@ -81,7 +86,7 @@ string getReturnVars(string returns)
 
 void burnCoalInside(string line, ofstream &out)
 {
-    if(firstC(line) == '(') // Returns Conversions, for tuple and tie
+    if (firstC(line) == '(') // Returns Conversions, for tuple and tie
     {
         string returns = returnsIn(line);
 
@@ -103,6 +108,22 @@ void burnCoalInside(string line, ofstream &out)
     }
     else if (has(line, "match"))
     {
+        match (varTuple)
+        {
+            (int i, str s) => cout << "int, str: " << i << " - " << s << "\n"
+            (str s1, str s2) => cout << "str, str: " << s1 << " - " << s2 << "\n"
+        }
+
+        match (varTuple)
+        (
+            pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
+            pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; }
+        );
+        
+
+
+
+
 
     }
     else
