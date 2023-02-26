@@ -5,6 +5,7 @@
 #include "mpark/patterns.hpp" 
 using namespace std; 
 using namespace mpark::patterns; 
+
 using str = std::string; 
 template <typename T> 
 void println(T var) { cout << var << endl; } 

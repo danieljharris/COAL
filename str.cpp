@@ -89,11 +89,6 @@ public:
         return seglist;
     }
 
-    str returnsOut()
-    {
-        return s.substr(s.find("return") + 7);
-    }
-
     // get values inside first set of ( )
     str returns()
     {

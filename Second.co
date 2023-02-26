@@ -1,9 +1,9 @@
 //variant<tuple<lit, int>, tuple<lit, lit>>giveVariant2(int in)
 (str, int | str, str)giveVariant2(int in)
 {
-    if (in == 1) return "ok", 10
-    if (in == 2) return "ok", 88
-    else         return "error", "unexpected_int"
+    if (in == 1) return ("ok", 10)
+    if (in == 2) return ("ok", 88)
+    else         return ("error", "unexpected_int")
 }
 
 (int | str)giveVariant3(int in)
@@ -15,8 +15,8 @@
 
 (int | str, int)giveVariant4(int in)
 {
-    if (in == 1) return "ok", 10
-    if (in == 2) return "ok", 88
+    if (in == 1) return ("ok", 10)
+    if (in == 2) return ("ok", 88)
     else         return 0
 }
 
@@ -30,6 +30,9 @@
 
 
     (int, str | str, str | int | int, str, str) varTuple = 54
+
+    int test10 = 10
+    (int, str) test11 = (10, "ok")
 
     match (varTuple)
     {

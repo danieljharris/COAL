@@ -10,12 +10,12 @@
 
 (int, int)myDoubleFunction()
 {
-    return 37, 42
+    return (37, 42)
 }
 
 (str, int, int)returnBack(int x)
 {
-    return "xxxx", 88, x
+    return ("xxxx", 88, x)
 }
 
 (int)main()

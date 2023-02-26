@@ -46,6 +46,10 @@ int main()
     variant<tuple<int, str>, tuple<str, str>, int, tuple<int, str, str>> varTuple = 54;
 
 
+    int test10 = 10;
+    tuple<int, str> test11 = make_tuple(10, "ok");
+
+
     match (varTuple)
     (
         pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
