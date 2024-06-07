@@ -10,12 +10,12 @@
 
 (int, int)myDoubleFunction()
 {
-    return 37, 42
+    return (37, 42)
 }
 
 (str, int, int)returnBack(int x)
 {
-    return "xxxx", 88, x
+    return ("xxxx", 88, x)
 }
 
 (int)main()
@@ -39,6 +39,7 @@
     println(third)
     println("--------------------")
 
+    // Tuple extraction
     (int, int) holdingTuple = myDoubleFunction()
     int u = holdingTuple<0>
     int k = holdingTuple<1>

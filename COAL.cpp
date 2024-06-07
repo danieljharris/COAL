@@ -153,11 +153,11 @@ void burnCoalInside(string line, ofstream &out)
         // int x; int y; int z;
         // tie(x, y, z) = returnBack(10);
 
-        str returns = str(l.returns());
+        str returns = str(l.getBefore("=").returns());
 
         if (returns.has(",", "|"))
         {
-            out << "    variant<";
+            out << l.getSpacing() << "variant<";
 
             vector<str> types = returns.split('|');
 
@@ -187,8 +187,20 @@ void burnCoalInside(string line, ofstream &out)
             // tuple<int, int> holdingTuple = myDoubleFunction()
 
             // out << "tuple<" << split(returns, ',') << "> ";
-            out << "    tuple<" << returns.getReturnTypes() << ">";
-            out << l.afterReturns() << ";\n";
+            out << l.getSpacing() << "tuple<"
+                << returns << ">";
+            
+            if (l.getAfter("=").has(","))
+            {
+                out << l.afterReturns().getBefore("=")
+                    << "= make_tuple("
+                    << l.getAfter("=").getAfter("(")
+                    << ";\n";
+            }
+            else
+            {
+                out << l.afterReturns() << ";\n";
+            }
         }
         else if (returns.has(","))   
         {
@@ -205,10 +217,12 @@ void burnCoalInside(string line, ofstream &out)
                 out << "    " << returns.s << " = " <<  l.afterReturns() << ";\n";
         }
     }
-    else if (l.has("return", ","))
+    else if (l.has("return", ",") && l.getAfter("return").firstIs('('))
     {
-        out << l.getBefore("return");
-        out << "return make_tuple(" << l.returnsOut() << ");\n";
+        out << l.getBefore("return")
+            << "return make_tuple("
+            << l.getAfter("return").getAfter("(")
+            << ";\n";
     }
     else if (l.lastIs('>'))
     {
@@ -293,8 +307,8 @@ int main()
     bool insideFunction = false;
     int depth = 0;
 
-    //string file = "First";
-    string file = "Second";
+    string file = "First";
+    //string file = "Second";
 
     ifstream in(file + ".co");
     ofstream out(file + ".cpp");
@@ -330,11 +344,7 @@ int main()
         else                burnCoalOutside(line, out);
     }
 
-    //out << "\n    return 0;\n}";
-
-    //out << outFile;
     out.close();
-
 
     system(("g++ -std=c++20 " + file + ".cpp -o " + file).c_str());
     system(("./" + file).c_str());
