@@ -4,6 +4,7 @@
 #include <string>
 #include <typeinfo>
 #include <variant>
+#include <any>
 #include <tuple>
 #include <cstdio>
 #include "mpark/patterns.hpp"
@@ -219,7 +220,8 @@ int main()
 
     // variant<tuple<int, str>, tuple<str, str>, int> varTuple = make_tuple(101, "hello");
     // variant<tuple<int, str>, tuple<str, str>, int> varTuple = make_tuple("test", "bob");
-    variant<tuple<int, str>, tuple<str, str>, int> varTuple = 542;
+    // variant<tuple<int, str>, tuple<str, str>, int> varTuple = (int)542;
+    variant<tuple<int, str>, tuple<str, str>, int> varTuple = make_tuple(5, "bob");
 
     // match (litVari)
     // {
@@ -228,11 +230,33 @@ int main()
     //     (int x) => cout << "int: " << x << "\n"
     // }
 
-    match (varTuple)
+    // IDENTIFIERS(x, y);
+
+    int testInt = 10;
+    // variant<int, str> testInt = 10;
+    // variant<int> testInt = 10;
+
+    // variant<any> testvar22 = testInt;
+
+    // match (varTuple)
+    // match (testInt)
+    // match ((variant<int>)testInt)
+    match ((any)testInt)
     (
-        pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
-        pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; },
-        pattern(as<int>(arg))                      = [](int x) { cout << "int: " << x << "\n"; }
+        // pattern(as<tuple<int, str>>(ds(arg, arg))) = [](int i, str s) { cout << "int, str: " << i << " - " << s << "\n"; },
+
+        // pattern(as<tuple<int, str>>(ds(arg, _))) = [](int i) { cout << "int: " << i << "\n"; }, // WORKING!
+        // pattern(as<tuple<int, str>>(ds(5, _))) = [] { cout << "int: sddsfsdfsdf\n"; },
+
+
+        // pattern(as<tuple<int, _>>(ds(arg, _))) = [](int i) { cout << "int: " << i << "\n"; },
+        // pattern(ds(as<int>(arg), _)) = [](int i) { cout << "int: " << i << "\n"; },
+        // pattern(ds(x, y)) = [](auto x, auto y) { cout << "int: " << x << "\n"; },
+
+
+        // pattern(as<tuple<str, str>>(ds(arg, arg))) = [](str s1, str s2) { cout << "str, str: " << s1 << " - " << s2 << "\n"; },
+        pattern(as<int>(arg))             = [](int x) { cout << "int: " << x << "\n"; }
+        // pattern(arg)                      = [](int x) { cout << "int: " << x << "\n"; }
     );
 
 

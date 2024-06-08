@@ -1,0 +1,80 @@
+//variant<tuple<lit, int>, tuple<lit, lit>>giveVariant2(int in)
+(str, int | str, str)giveVariant2(int in)
+{
+    if (in == 1) return ("ok", 10)
+    if (in == 2) return ("ok", 88)
+    else         return ("error", "unexpected_int")
+}
+
+(int | str)giveVariant3(int in)
+{
+    if (in == 1) return "ok"
+    if (in == 2) return 88
+    else         return "error"
+}
+
+(int | str, int)giveVariant4(int in)
+{
+    if (in == 1) return ("ok", 10)
+    if (in == 2) return ("ok", 88)
+    else         return 0
+}
+
+(int)main()
+{
+    // for (int i = 0; i < 15; i++)
+    // {
+        // match(i % 3, i % 5)
+        // {
+            // (int 0) => cout << "FizzBuzz\n"
+            // (int 0, int 0) => cout << "FizzBuzz\n"
+            // (int 0, int _) => cout << "Fizz\n"
+            // (int _, int 0) => cout << "Buzz\n"
+            // (int _, int _) => cout << i << "\n"
+        // }
+    // }
+
+
+    // Match literal 0
+
+    // int test = 0
+
+    // match (test)
+    // {
+    //     // (int 0) => cout << "woot woot\n"
+    //     (int x) => cout << "woot woot\n"
+    // }
+    
+
+    // (str, int | str, str)giveVariant2(1)
+
+
+    // variant<tuple<string,int>, tuple<string, string>> myVari = make_tuple("test", 66);
+    (str, int | str, str) myVari = giveVariant2(1)
+
+
+    // (int, str | str, str | int | int, str, str) varTuple = (int)54
+    (int, str | str, str | int | int, str, str) varTuple = ("ok", "test")
+
+    (int | str) test10 = (int)10
+    (int, str) test11 = (10, "ok")
+    int test12 = 10
+
+    match (varTuple)
+    // match (test10)
+    // match (test11)
+    // match ((any)test12) // as<> pattern only supports variables that CAN be multiple types
+    {
+        (int i, str s) => cout << "int, str: " << i << " - " << s << "\n"
+
+        // (str s1, str s2) => cout << "str, str: " << s1 << " - " << s2 << "\n"
+        (str s1, str _) => cout << "str, str: " << s1 << "\n"
+        // (str _, str s2) => cout << "str, str: " << s2 << "\n"
+
+        // (int x) => cout << "int: " << x << "\n"
+        (int i, str s1, str s2) => cout << "Yolo"
+        (int _) => cout << "int: asdasdasd\n"
+    }
+
+    return 0
+}

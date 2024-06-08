@@ -4,15 +4,15 @@
 
 
 
-    public List<Software>      Software      {get; set;} = new List<Software>();
-    public List<Hardware>      Hardware      {get; set;} = new List<Hardware>();
-    public List<DataSources>   DataSources   {get; set;} = new List<DataSources>();
-    public List<AttackVectors> AttackVectors {get; set;} = new List<AttackVectors>();
+    // public List<Software>      Software      {get; set;} = new List<Software>();
+    // public List<Hardware>      Hardware      {get; set;} = new List<Hardware>();
+    // public List<DataSources>   DataSources   {get; set;} = new List<DataSources>();
+    // public List<AttackVectors> AttackVectors {get; set;} = new List<AttackVectors>();
 
     
-    Struct listOfObjs = "List<$Type> $Name {get; set;} = new List<$Type>()";
-    Accessor listOfObjsAccessor = public;
-    List<Types> listOfObjsTypes = new List<Types>() {Software, Hardware, DataSources, AttackVectors};
+    // Struct listOfObjs = "List<$Type> $Name {get; set;} = new List<$Type>()";
+    // Accessor listOfObjsAccessor = public;
+    // List<Types> listOfObjsTypes = new List<Types>() {Software, Hardware, DataSources, AttackVectors};
 
 
 

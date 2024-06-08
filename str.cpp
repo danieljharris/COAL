@@ -18,7 +18,21 @@ public:
     }
     str(string string)
     {
-        s = string;
+        // s = string;
+        // s = string.erase(string.find_last_not_of(" \t\n\r") + 1);
+        if (!string.empty() && string.find_last_not_of(" \r") != std::string::npos)
+        {
+            s = string.erase(string.find_last_not_of(" \r") + 1);
+        }
+        else
+        {
+            s = string;
+        }
+    }
+
+    int length()
+    {
+        return s.erase(s.find_last_not_of(" \r") + 1).length();
     }
 
     char firstC()
@@ -48,9 +62,17 @@ public:
         return s.find(find) != string::npos;
     }
 
+    // Has both strings
     bool has(string find1, string find2)
     {
         return s.find(find1) != string::npos && s.find(find2) != string::npos;
+    }
+
+    bool isNumber()
+    {
+        std::string::const_iterator it = s.begin();
+        while (it != s.end() && std::isdigit(*it)) ++it;
+        return !s.empty() && it == s.end();
     }
 
     str getSpacing()

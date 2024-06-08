@@ -94,14 +94,30 @@ void insideMatch(str l, ofstream &out)
         }
         out << l.getSpacing();
 
+        // out << "pattern(as<";
+
+        // out << "pattern(";
+
+        
         out << "pattern(as<";
+        
+
+
+
 
         str returns = l.returns();
         str returnsTypes = returns.getReturnTypes();
+        str returnsNames = returns.getReturnNames();
 
         if (!l.has(","))
         {
             out << returnsTypes << ">(arg)) = [](" << returns << ") {";
+            // out << returnsTypes << ">(";
+
+            // if (returnsNames.isNumber())
+            //     out << "_)) = [] {";
+            // else
+            //     out << "arg)) = [](" << returns << ") {";
         }
         else
         {
@@ -179,7 +195,21 @@ void burnCoalInside(string line, ofstream &out)
                 if(i < types.size()) out << ", ";
                 i++;
             }
-            out << ">" << l.afterReturns() << ";\n";
+
+            str afterReturns = l.afterReturns();
+
+            out << ">" << afterReturns.getBefore("=") << " = ";
+
+            if (afterReturns.getAfter("=").has(","))
+            {
+                out << "make_tuple("
+                    << afterReturns.getAfter("=").getAfter("(")
+                    << ";\n";
+            }
+            else
+            {
+                out << afterReturns.getAfter("=") << ";\n";
+            }
         }
         else if (returns.has(",") && l.has("="))
         {
@@ -193,7 +223,7 @@ void burnCoalInside(string line, ofstream &out)
             if (l.getAfter("=").has(","))
             {
                 out << l.afterReturns().getBefore("=")
-                    << "= make_tuple("
+                    << " = make_tuple("
                     << l.getAfter("=").getAfter("(")
                     << ";\n";
             }
@@ -212,7 +242,14 @@ void burnCoalInside(string line, ofstream &out)
         else
         {
             if (returns.has("|"))
-                out << "//PLACE HOLDER 2";
+            {
+                // out << "//PLACE HOLDER 2";
+                out << "    ";
+                out << "variant<";
+                out << returns.replace(" |", ",");
+                out << ">";
+                out << l.afterReturns() << ";\n";
+            }
             else
                 out << "    " << returns.s << " = " <<  l.afterReturns() << ";\n";
         }
@@ -220,21 +257,21 @@ void burnCoalInside(string line, ofstream &out)
     else if (l.has("return", ",") && l.getAfter("return").firstIs('('))
     {
         out << l.getBefore("return")
-            << "return make_tuple("
+            << " return make_tuple("
             << l.getAfter("return").getAfter("(")
             << ";\n";
     }
     else if (l.lastIs('>'))
     {
         out << l.getBefore("=")
-            << "= get<" << l.extractBetween("<", ">")
+            << " = get<" << l.extractBetween("<", ">")
             << ">(" << l.extractBetween(" = ", "<")
             << ");\n";
     }
     else
     {
         out << l.s;
-        if (l.s.length() > 0) out << ";";
+        if (l.length() > 0) out << ";";
         out << endl;
     }
 }
@@ -247,7 +284,7 @@ void burnCoalOutside(string line, ofstream &out)
         str returns = l.returns();
         str rest = l.getAfter(")");
 
-        if (returns.s.length() == 0)
+        if (returns.length() == 0)
         {
             out << "void ";
         }
@@ -297,7 +334,7 @@ void burnCoalOutside(string line, ofstream &out)
     else
     {
         out << line;
-        if (line.length() > 0) out << ";";
+        if (l.length() > 0) out << ";";
         out << endl;
     }
 }
@@ -307,8 +344,10 @@ int main()
     bool insideFunction = false;
     int depth = 0;
 
-    string file = "First";
-    //string file = "Second";
+    // string file = "First";
+    // string file = "Second";
+    // string file = "Third";
+    string file = "FizzBuzz";
 
     ifstream in(file + ".co");
     ofstream out(file + ".cpp");
@@ -321,7 +360,7 @@ int main()
         str l = str(line);
         if (l.firstIs('/')) continue; //Skips over comments
 
-        if (insideFunction && line.length() == 0)
+        if (insideFunction && l.length() == 0)
         {
             out << "\n";
         }
